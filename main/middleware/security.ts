@@ -394,6 +394,16 @@ export const corsOptions = {
       if (hostname === 'localhost' || hostname.endsWith('.local') || isAllowedPrivateIp(hostname)) {
         return callback(null, true);
       }
+
+      if (process.env.ALLOWED_ORIGINS) {
+        if (process.env.ALLOWED_ORIGINS === '*') {
+          return callback(null, true);
+        }
+        const allowed = process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim().toLowerCase());
+        if (allowed.includes(origin.toLowerCase()) || allowed.includes(parsedOrigin.origin.toLowerCase())) {
+          return callback(null, true);
+        }
+      }
       
       callback(new Error('Not allowed by CORS'));
     } catch (err) {
